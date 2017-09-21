@@ -3,9 +3,12 @@ public class main {
         Driver driver = new Driver();
         //Node test = new Node("A");
         //System.out.println(test);
-        driver.getInput("C:\\Users\\Dave\\IdeaProjects\\decipher1\\src\\input.txt");
+        driver.getInput("src/input.txt");
         driver.makeGraph();
-        driver.routes();
-
+        //driver.routes();
+        //driver.routeToC();
+        //driver.printAdjMatrix();
+        //driver.tripStop();
+        driver.visitCities();
     }
 }

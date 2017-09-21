@@ -7,14 +7,14 @@ import java.util.ArrayList;
 
 
 public class Driver {
-    private Graph graph;
+    protected Graph graph;
 
     private Scanner inputScanner;
     private ArrayList<char[]> inputs;
 
     public Driver(){
-         graph = new Graph();
-         inputs = new ArrayList<char[]>();
+        graph = new Graph();
+        inputs = new ArrayList<char[]>();
     }
 
     /**
@@ -48,7 +48,7 @@ public class Driver {
         for(char[] in: inputs){
             //System.out.println(String.valueOf(in[0]));
             graph.addEdge(String.valueOf(in[0]), String.valueOf(in[1]),
-                          Character.getNumericValue(in[2]));
+                    Character.getNumericValue(in[2]));
         }
         //System.out.println(graph.getNode("A"));
         //System.out.println(graph.nodeMap);
@@ -82,9 +82,38 @@ public class Driver {
     public void routes(){
         System.out.println("Output #1: " + graph.specificRoute("ABC"));
         System.out.println("Output #2: " + graph.specificRoute("AD"));
-        System.out.println("Output #2: " + graph.specificRoute("ADE"));
+        System.out.println("Output #3: " + graph.specificRoute("ADC"));
         System.out.println("Output #4: " + graph.specificRoute("AEBCD"));
-        System.out.println("Output #4: " + graph.specificRoute("AED"));
+        System.out.println("Output #5: " + graph.specificRoute("AED"));
+    }
+
+    public void tripStop(){
+        //System.out.println("Output #6: " + graph.triprecurse("C","C", 3, false));
+        //System.out.println("Output #7: " + graph.triprecurse("A","C", 4, true));
+    }
+    public void visitCities(){
+        graph.visitCities("A", "C", 4);
+    }
+
+    public void routeToC(){
+        graph.roundTrip("C", 3);
+    }
+
+    public void adjacency(){
+        int[][] adjmatrix = graph.getAdjacencyMatrix();
+        System.out.println(adjmatrix);
+
+    }
+    /**
+     * Prints the adjacency matrix.
+     */
+    public void printAdjMatrix(){
+        int[][] matrix = graph.getAdjacencyMatrix();
+        for (int i=0;i<matrix.length;i++){
+            for (int j=0;j<matrix.length;j++)
+                System.out.print(matrix[i][j]+"");
+            System.out.println();
+        }
     }
 
 }

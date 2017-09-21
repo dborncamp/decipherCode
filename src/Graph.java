@@ -141,4 +141,168 @@ public class Graph {
 
         return Integer.toString(total);
     }
+
+    private void unvisitAll(){
+        for(Map.Entry<String, Node> entry: nodes.entrySet()){
+            Node node = entry.getValue();
+            node.unvisit();
+        }
+    }
+
+    public int roundTrip(String city, int maxStops){
+        Node startNode = nodes.get(city);
+        int total = 0;
+
+        visitNode(startNode);
+
+        unvisitAll();
+        return total;
+    }
+
+    /**
+     * Recursively visit each node
+     * @param node node to visit neighbors of
+     */
+    private void visitNode(Node node){
+        if (node.isVisited()){
+            return;
+        }
+        node.visit();
+        System.out.println("Visiting: " + node.getName());
+        for(Map.Entry<String, Edge> edgeEntry: node.neighbors.entrySet()){
+            Edge edge = edgeEntry.getValue();
+            System.out.println(edge);
+            visitNode(edge.dest);
+        }
+    }
+
+    public int[][] getAdjacencyMatrix() {
+        int[][] adjMatrix = new int[nodes.size()][nodes.size()];
+
+        int i = 0;
+        int j = 0;
+
+        for(Map.Entry<String, Node> entry: nodes.entrySet()) {
+            String name = entry.getKey();
+            Node node = entry.getValue();
+            for(Map.Entry<String, Edge> edgeEntry: node.neighbors.entrySet()) {
+                Edge edge = edgeEntry.getValue();
+
+                if(edge.source.equals(node.getName())){
+                    adjMatrix[i][j] = edge.dist;
+                }
+            }
+        }
+            return adjMatrix;
+    }
+
+    public String tripsBetweenNodes(Node start, Node end, int limit){
+        int numTrips = 0;
+        Node startNode = nodes.get(start);
+
+        // look at every edge from starting node
+        for(Map.Entry<String, Edge> edgeEntry: startNode.neighbors.entrySet()) {
+            int counter = 0;
+            while(true) {
+                Edge edge = edgeEntry.getValue();
+
+                if (counter > limit){
+                    break;
+                }
+                if (edge.dest == end){
+                    numTrips ++;
+                }
+            }
+        }
+        return Integer.toString(numTrips);
+    }
+
+    private int tripHelperCounter;
+    private int limit;
+    private boolean equal;
+    int numTrips;
+    public int triprecurse(String start, String target, int tripLimit, boolean tripEqual){
+        numTrips = 0;
+        limit = tripLimit;
+        equal = tripEqual;
+        Node startNode = nodes.get(start);
+        Node targetNode = nodes.get(target);
+
+        for(Map.Entry<String, Edge> edgeEntry: startNode.neighbors.entrySet()) {
+            tripHelperCounter = 1;
+            Edge edge = edgeEntry.getValue();
+            System.out.println("Starting at: " + startNode + " looking for: " + targetNode);
+            triphelper(edge.dest, targetNode);
+            //System.out.println("Found: " + tripHelperCounter);
+
+        }
+        return numTrips;
+    }
+
+    public void triphelper(Node start, Node target){
+        if (start == target){
+            System.out.println("FOUND TARGET!!! " + tripHelperCounter);
+            if (equal){
+                if (tripHelperCounter == limit - 1) {
+                    System.out.println("equal: " + tripHelperCounter);
+                    numTrips++;
+                }
+            } else {
+                if (tripHelperCounter <= limit) {
+                    System.out.println("maximum: " + tripHelperCounter);
+                    numTrips++;
+                }
+            }
+            return;
+        }
+
+        for(Map.Entry<String, Edge> edgeEntry: start.neighbors.entrySet()) {
+            Edge edge = edgeEntry.getValue();
+            System.out.println("looking at: " + edge);
+            tripHelperCounter ++;
+            triphelper(edge.dest, target);
+            tripHelperCounter --;
+        }
+        //tripHelperCounter --;
+    }
+
+    private int visitLimit;
+    private void popQueue(Node startNode, Node target){
+        if (startNode.isVisited()){
+            return;
+        }
+        startNode.visit();
+        tripHelperCounter ++;
+        for(Map.Entry<String, Edge> edgeEntry: startNode.neighbors.entrySet()){
+            Edge edge = edgeEntry.getValue();
+
+            q.add(edge.dest);
+            System.out.println(edge +" "+ edge.dest + " " + tripHelperCounter);
+            popQueue(edge.dest, target);
+            if(edge.dest == target){
+                System.out.println("Found: " + target + " in " + tripHelperCounter);
+                if(tripHelperCounter == visitLimit) {
+                    numTrips++;
+                }
+            }
+
+        }
+        System.out.println("Back From " + startNode);
+        startNode.unvisit();
+        tripHelperCounter --;
+    }
+
+    public void visitCities(String start, String target, int visLimit){
+        Node startNode = nodes.get(start);
+        Node targNode = nodes.get(target);
+        visitLimit = visLimit;
+        numTrips = 0;
+        tripHelperCounter = 0;
+        popQueue(startNode, targNode);
+
+
+
+        System.out.println(numTrips);
+
+    }
 }
