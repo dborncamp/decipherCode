@@ -9,7 +9,7 @@ public class Graph {
     // https://docs.oracle.com/javase/tutorial/collections/interfaces/map.html
     protected Map<String, Node> nodes = new HashMap<String, Node>();
     //protected Vector<Edge> edges = new Vector<Edge>();
-    private Queue<Node> q = new LinkedList<Node>();
+    private LinkedList<Node> nList = new LinkedList<Node>();
 
     public int shortestPath(String startName){
         Node start = nodes.get(startName);
@@ -176,27 +176,7 @@ public class Graph {
         }
     }
 
-    public int[][] getAdjacencyMatrix() {
-        int[][] adjMatrix = new int[nodes.size()][nodes.size()];
-
-        int i = 0;
-        int j = 0;
-
-        for(Map.Entry<String, Node> entry: nodes.entrySet()) {
-            String name = entry.getKey();
-            Node node = entry.getValue();
-            for(Map.Entry<String, Edge> edgeEntry: node.neighbors.entrySet()) {
-                Edge edge = edgeEntry.getValue();
-
-                if(edge.source.equals(node.getName())){
-                    adjMatrix[i][j] = edge.dist;
-                }
-            }
-        }
-            return adjMatrix;
-    }
-
-    public String tripsBetweenNodes(Node start, Node end, int limit){
+     public String tripsBetweenNodes(Node start, Node end, int limit){
         int numTrips = 0;
         Node startNode = nodes.get(start);
 
@@ -221,54 +201,12 @@ public class Graph {
     private int limit;
     private boolean equal;
     int numTrips;
-    public int triprecurse(String start, String target, int tripLimit, boolean tripEqual){
-        numTrips = 0;
-        limit = tripLimit;
-        equal = tripEqual;
-        Node startNode = nodes.get(start);
-        Node targetNode = nodes.get(target);
-
-        for(Map.Entry<String, Edge> edgeEntry: startNode.neighbors.entrySet()) {
-            tripHelperCounter = 1;
-            Edge edge = edgeEntry.getValue();
-            System.out.println("Starting at: " + startNode + " looking for: " + targetNode);
-            triphelper(edge.dest, targetNode);
-            //System.out.println("Found: " + tripHelperCounter);
-
-        }
-        return numTrips;
-    }
-
-    public void triphelper(Node start, Node target){
-        if (start == target){
-            System.out.println("FOUND TARGET!!! " + tripHelperCounter);
-            if (equal){
-                if (tripHelperCounter == limit - 1) {
-                    System.out.println("equal: " + tripHelperCounter);
-                    numTrips++;
-                }
-            } else {
-                if (tripHelperCounter <= limit) {
-                    System.out.println("maximum: " + tripHelperCounter);
-                    numTrips++;
-                }
-            }
-            return;
-        }
-
-        for(Map.Entry<String, Edge> edgeEntry: start.neighbors.entrySet()) {
-            Edge edge = edgeEntry.getValue();
-            System.out.println("looking at: " + edge);
-            tripHelperCounter ++;
-            triphelper(edge.dest, target);
-            tripHelperCounter --;
-        }
-        //tripHelperCounter --;
-    }
 
     private int visitLimit;
-    private void popQueue(Node startNode, Node target){
+    private void visitQueue(Node startNode, Node target){
         if (startNode.isVisited()){
+            Node removeNode = nList.removeLast();
+            System.out.println("Back From " + removeNode);
             return;
         }
         startNode.visit();
@@ -276,20 +214,25 @@ public class Graph {
         for(Map.Entry<String, Edge> edgeEntry: startNode.neighbors.entrySet()){
             Edge edge = edgeEntry.getValue();
 
-            q.add(edge.dest);
-            System.out.println(edge +" "+ edge.dest + " " + tripHelperCounter);
-            popQueue(edge.dest, target);
+            nList.add(edge.dest);
+
+            System.out.println(edge +" "+ edge.dest + " " + tripHelperCounter + " Q: " + nList);
+
             if(edge.dest == target){
-                System.out.println("Found: " + target + " in " + tripHelperCounter);
+                System.out.println("Found: " + target + " in " + tripHelperCounter + " "+nList);
                 if(tripHelperCounter == visitLimit) {
+                    System.out.println("Adding " + nList +"\n");
                     numTrips++;
                 }
             }
+            visitQueue(edge.dest, target);
 
         }
-        System.out.println("Back From " + startNode);
-        startNode.unvisit();
+        Node removeNode = nList.removeLast();
+        System.out.println("Back From " + removeNode);
+        removeNode.unvisit();
         tripHelperCounter --;
+        System.out.println("Removing: " + removeNode + "   " + nList);
     }
 
     public void visitCities(String start, String target, int visLimit){
@@ -298,11 +241,11 @@ public class Graph {
         visitLimit = visLimit;
         numTrips = 0;
         tripHelperCounter = 0;
-        popQueue(startNode, targNode);
-
-
+        nList.add(startNode);
+        visitQueue(startNode, targNode);
 
         System.out.println(numTrips);
+        System.out.println(nList);
 
     }
 }

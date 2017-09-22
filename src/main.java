@@ -5,10 +5,7 @@ public class main {
         //System.out.println(test);
         driver.getInput("src/input.txt");
         driver.makeGraph();
-        //driver.routes();
-        //driver.routeToC();
-        //driver.printAdjMatrix();
-        //driver.tripStop();
+        driver.routes();
         driver.visitCities();
     }
 }

@@ -79,6 +79,9 @@ public class Driver {
         }
     }
 
+    /**
+     * Print the routes for outputs 1 to 5
+     */
     public void routes(){
         System.out.println("Output #1: " + graph.specificRoute("ABC"));
         System.out.println("Output #2: " + graph.specificRoute("AD"));
@@ -97,23 +100,6 @@ public class Driver {
 
     public void routeToC(){
         graph.roundTrip("C", 3);
-    }
-
-    public void adjacency(){
-        int[][] adjmatrix = graph.getAdjacencyMatrix();
-        System.out.println(adjmatrix);
-
-    }
-    /**
-     * Prints the adjacency matrix.
-     */
-    public void printAdjMatrix(){
-        int[][] matrix = graph.getAdjacencyMatrix();
-        for (int i=0;i<matrix.length;i++){
-            for (int j=0;j<matrix.length;j++)
-                System.out.print(matrix[i][j]+"");
-            System.out.println();
-        }
     }
 
 }
