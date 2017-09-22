@@ -200,8 +200,7 @@ public class Graph {
     private int tripHelperCounter;
     private int limit;
     private boolean equal;
-    int numTrips;
-
+    private int numTrips;
     private int visitLimit;
     private void visitQueue(Node startNode, Node target){
         if (startNode.isVisited()){
@@ -248,4 +247,101 @@ public class Graph {
         System.out.println(nList);
 
     }
+
+
+    public void getPaths(Node startNode, Node target, int visLimit){
+        Deque<Node> visitedNodes = new LinkedList<Node>();
+        Deque<Node> nextNodes = new LinkedList<Node>();
+
+        Trip trip = new Trip(startNode, target);
+
+        int count = 0;
+
+        // first push the start node to the next stack.
+        nextNodes.push(startNode);
+
+        // 1 enter a loop until the next stack is empty.
+        while(!nextNodes.isEmpty()){
+            // 2 pop the next stack (giving me my start node).
+            Node next = nextNodes.pop();
+
+            // 3 push it to the visited stack.
+            visitedNodes.push(next);
+
+            // 4 update result trip
+            //TODO
+
+            // 5 check if the popped value is my goal
+            if (next == target){
+                // + 2 because including source and destination
+                if(visitedNodes.size() == visLimit + 2){
+                    numTrips ++;
+                    System.out.println("** Perfect!! **");
+                }
+
+                System.out.println("Found " + target);
+                System.out.println("   Current node: " + next);
+                System.out.println("   nextNodes: "+ nextNodes);
+                System.out.println("   visitedNodes: "+visitedNodes);
+                //nextNodes.pop();
+            }
+
+            // 6  & 7 get the destinations I can reach from the node. loop over the destinations.
+            for(Map.Entry<String, Edge> edgeEntry: next.neighbors.entrySet()){
+                Edge edge = edgeEntry.getValue();
+
+                // 7a check my delimiter condition
+                if(visitedNodes.size() > visLimit){
+                    System.out.println("Limit Reached " + target);
+                    System.out.println("   Current node: " + next);
+                    System.out.println("   nextNodes: "+ nextNodes);
+                    System.out.println("   visitedNodes: "+visitedNodes);
+                    nextNodes.pop();
+                    visitedNodes.pop();
+                    continue;
+                }
+                // 7b - I add each to the next stack.
+                nextNodes.push(edge.dest);
+                System.out.println(edge);
+
+                count ++;
+            }
+            System.out.println("Current node: " + next);
+            System.out.println("nextNodes: "+ nextNodes);
+            System.out.println("visitedNodes: "+visitedNodes);
+            // stop possible infinite loop
+            if (count > 100) {
+                break;
+            }
+        }
+    }
+
+    class Trip{
+        Node source;
+        Node dest;
+        ArrayList path;
+
+        public Trip(Node src, Node dst){
+            source = src;
+            dest = dst;
+            path = new ArrayList();
+        }
+
+        public void addTrip(Deque<Node> pathNodes){
+            path.add(pathNodes);
+        }
+    }
+
+    public void visitPaths(String start, String target, int visLimit){
+        numTrips = 0;
+        Node startNode = nodes.get(start);
+        Node targNode = nodes.get(target);
+        getPaths(startNode, targNode, visLimit);
+        System.out.println(numTrips);
+    }
+
+    public void shortPath(Node sourceNode){
+
+    }
 }
+

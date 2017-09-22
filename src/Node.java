@@ -4,7 +4,6 @@ import java.util.Map;
 
 public class Node {
     protected String name;
-    //protected ArrayList<Edge> neighbors;
     protected Map<String, Edge> neighbors;
     public Node last;
     public int temp;

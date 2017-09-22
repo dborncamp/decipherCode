@@ -102,4 +102,7 @@ public class Driver {
         graph.roundTrip("C", 3);
     }
 
+    public void visits(){
+        graph.visitPaths("A","C", 4);
+    }
 }

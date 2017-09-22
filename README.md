@@ -43,7 +43,7 @@ distance of 4).
     to C.
     The length of the shortest route (in terms of distance to travel) from B
     to B.
-    The number of different routes from C to C with a distance of less than
+    The number of different routes from C to C with a distance of less than 30
     In the sample data, the trips are: CDC, CEBC, CEBCDC, CDCEBC, CDEBC,
     CEBCEBC, CEBCEBCEBC.
 

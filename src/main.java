@@ -5,7 +5,8 @@ public class main {
         //System.out.println(test);
         driver.getInput("src/input.txt");
         driver.makeGraph();
-        driver.routes();
-        driver.visitCities();
+        //driver.routes();
+        //driver.visitCities();
+        driver.visits();
     }
 }
