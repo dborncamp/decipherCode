@@ -22,13 +22,7 @@ public class Graph {
     }
 
 
-    /**
-     * Get the nodes map of the graph.
-     * @return nodes in graph.
-     */
-    public Map getNodes(){
-        return nodes;
-    }
+
     /**
      * A function to print the edges from all of the nodes.
      * Nice for debugging and making sure that the graph got read in properly.
@@ -61,7 +55,7 @@ public class Graph {
 
     /**
      * Add a an edge to the graph. If nodes do not exist, add them
-     * @param sourceName Name of source
+     * @param sourceName Name of map
      * @param destName Name of destination
      * @param dist Distance between the two
      */
@@ -249,86 +243,109 @@ public class Graph {
     }
 
 
-    public void getPaths(Node startNode, Node target, int visLimit){
-        Deque<Node> visitedNodes = new LinkedList<Node>();
-        Deque<Node> nextNodes = new LinkedList<Node>();
-
-        Trip trip = new Trip(startNode, target);
+    public ArrayList<Trip> getPaths(Node startNode, Node target, int visLimit){
+        Stack<Node> nextNodes = new Stack<Node>();
+        ArrayList<Trip> trips = new ArrayList<Trip>();
 
         int count = 0;
 
         // first push the start node to the next stack.
         nextNodes.push(startNode);
+        System.out.println(startNode.neighbors);
+        Trip trip = new Trip(startNode.neighbors, target, startNode, new Stack<Node>());
+        System.out.println(trip);
 
         // 1 enter a loop until the next stack is empty.
         while(!nextNodes.isEmpty()){
             // 2 pop the next stack (giving me my start node).
-            Node next = nextNodes.pop();
+            System.out.println("Next Nodes: "+nextNodes);
+            Node current = nextNodes.pop();
+            System.out.println("Current: "+ current);
 
             // 3 push it to the visited stack.
-            visitedNodes.push(next);
-
-            // 4 update result trip
-            //TODO
+            trip.visited.push(current);
+            // 4 update my current trip.
+            trip.currentCity = current;
+            //trip.updateCity(current);
+            System.out.println(" Trip: "+trip);
 
             // 5 check if the popped value is my goal
-            if (next == target){
-                // + 2 because including source and destination
-                if(visitedNodes.size() == visLimit + 2){
-                    numTrips ++;
-                    System.out.println("** Perfect!! **");
+            if ((trip.currentCity == trip.dest) & (trip.visited.size() > 1) & (trip.visited.size()==4)){// & (trip.visited.size() == 4)){
+                //5a - if it meets my goal, I update the trip collection with the current trip
+                trips.add(trip);
+                System.out.println(" ** Found: "+trip);
+                //5b - create a new trip matching the existing.
+                trip = new Trip(trip);
+
+            } else {
+                System.out.println(" --- not goal");
+                //6 - If it does not meet the goal, then get the destinations I can reach from the node
+                // (I defined a routemap object to give me this).
+                trip.map = current.neighbors;
+                System.out.println(trip.map);
+                // 7- I loop over all the destinations.
+                for (Map.Entry<String, Edge> edgeEntry : trip.map.entrySet()) {
+                    Edge edge = edgeEntry.getValue();
+
+                    //7a - I check my delimiter condition, if true proceed
+                    if (trip.visited.size() != 4) {
+                        System.out.println("Pushing: " + edge.dest);
+                        nextNodes.push(edge.dest);
+                        //8- if the delimiter condition is false this means the traversal cannot continue.
+                    } else {
+                        //8a - if the next stack is not empty, I need to get the current destination
+                        if (!nextNodes.isEmpty()) {
+                            Node dest = trip.dest;
+                            //8b- I make a new trip with the current destination
+                            // set as "currentInStack" as I described in my Trip.
+                            trip = new Trip(trip.map, trip.dest, dest, trip.visited);
+                        }
+                    }
+
                 }
 
-                System.out.println("Found " + target);
-                System.out.println("   Current node: " + next);
-                System.out.println("   nextNodes: "+ nextNodes);
-                System.out.println("   visitedNodes: "+visitedNodes);
-                //nextNodes.pop();
             }
-
-            // 6  & 7 get the destinations I can reach from the node. loop over the destinations.
-            for(Map.Entry<String, Edge> edgeEntry: next.neighbors.entrySet()){
-                Edge edge = edgeEntry.getValue();
-
-                // 7a check my delimiter condition
-                if(visitedNodes.size() > visLimit){
-                    System.out.println("Limit Reached " + target);
-                    System.out.println("   Current node: " + next);
-                    System.out.println("   nextNodes: "+ nextNodes);
-                    System.out.println("   visitedNodes: "+visitedNodes);
-                    nextNodes.pop();
-                    visitedNodes.pop();
-                    continue;
-                }
-                // 7b - I add each to the next stack.
-                nextNodes.push(edge.dest);
-                System.out.println(edge);
-
-                count ++;
-            }
-            System.out.println("Current node: " + next);
-            System.out.println("nextNodes: "+ nextNodes);
-            System.out.println("visitedNodes: "+visitedNodes);
+            trip.visited.pop();
             // stop possible infinite loop
+            count ++;
             if (count > 100) {
+                System.out.println("Limit Reached");
                 break;
             }
         }
+        return trips;
     }
 
     class Trip{
-        Node source;
+        Map<String,Edge> map;
         Node dest;
-        ArrayList path;
+        Node currentCity;
+        Stack<Node> visited;
 
-        public Trip(Node src, Node dst){
-            source = src;
+        public Trip(Map<String,Edge> routes, Node dst, Node current, Stack<Node> alreadyVisited){
+            map = routes;
             dest = dst;
-            path = new ArrayList();
+            currentCity = current;
+            visited = alreadyVisited;
         }
 
-        public void addTrip(Deque<Node> pathNodes){
-            path.add(pathNodes);
+        public Trip(Trip t){
+            map = t.map;
+            dest = t.dest;
+            currentCity = t.currentCity;
+            visited = t.visited;
+        }
+
+        public void updateCity(Node city){
+            currentCity = city;
+            visited.push(currentCity);
+        }
+
+        @Override
+        public String toString() {
+            String str = "";
+            for(Node city: visited) str+= city+" ";
+            return str;
         }
     }
 
@@ -336,12 +353,218 @@ public class Graph {
         numTrips = 0;
         Node startNode = nodes.get(start);
         Node targNode = nodes.get(target);
-        getPaths(startNode, targNode, visLimit);
-        System.out.println(numTrips);
+        ArrayList<Trip>trips = getPaths(startNode, targNode, visLimit);
+        System.out.println(trips.size());
     }
 
-    public void shortPath(Node sourceNode){
+    private void resetDist(){
+        for(Map.Entry<String, Node> entry: nodes.entrySet()){
+            Node node = entry.getValue();
+            node.temp = Integer.MAX_VALUE;
+            node.last = null;
+            node.unvisit();
+        }
 
     }
+
+
+
+    /**
+     * Get the nodes map of the graph.
+     * @return nodes in graph.
+     */
+    public ArrayList<Node> getNodes(){
+        ArrayList<Node> localNodes = new ArrayList<Node>();
+        for(Map.Entry<String, Node> entry: nodes.entrySet()) {
+            Node node = entry.getValue();
+            localNodes.add(node);
+        }
+        return localNodes;
+    }
+
+    /**
+     * Get the Edges map of the graph.
+     * @return edges between all of the nodes in the graph.
+     */
+    public ArrayList getEdges(){
+        ArrayList<Edge> edges = new ArrayList<Edge>();
+        for(Map.Entry<String, Node> entry: nodes.entrySet()) {
+            Node node = entry.getValue();
+            for (Map.Entry<String, Edge> edgeEntry : node.neighbors.entrySet()) {
+                Edge edge = edgeEntry.getValue();
+                edges.add(edge);
+            }
+        }
+        return edges;
+    }
+
 }
 
+/**
+ * Heavily taken from: http://www.vogella.com/tutorials/JavaAlgorithmsDijkstra/article.html
+ * Creative commons license...
+ */
+class DijkstraAlgorithm {
+    private final List<Node> nodes;
+    private final List<Edge> edges;
+    private Set<Node> visitedNodes;
+    private Set<Node> toVisitNodes;
+    private Map<Node, Node> predecessors;
+    Map<Node, Integer> distance;
+
+    public DijkstraAlgorithm(Graph graph) {
+        // create a copy of the array so that we can operate on this array
+        this.nodes = new ArrayList<Node>(graph.getNodes());
+        this.edges = new ArrayList<Edge>(graph.getEdges());
+    }
+
+    public void execute(Node source) {
+        visitedNodes = new HashSet<Node>();
+        toVisitNodes = new HashSet<Node>();
+        distance = new HashMap<Node, Integer>();
+        predecessors = new HashMap<Node, Node>();
+        distance.put(source, 0);
+        toVisitNodes.add(source);
+        int counter = 0;
+
+        while (toVisitNodes.size() > 0) {
+            //System.out.println(toVisitNodes);
+            Node node = getMinimum(toVisitNodes);
+            //System.out.println(node);
+            visitedNodes.add(node);
+            toVisitNodes.remove(node);
+            findMinimalDistances(node);
+        }
+    }
+
+    private void findMinimalDistances(Node node) {
+        List<Node> adjacentNodes = getNeighbors(node);
+        //System.out.println(adjacentNodes);
+        for (Node target : adjacentNodes) {
+            /*System.out.println("Target: " + node + " " + getShortestDistance(target));
+            System.out.println(node + " " + getShortestDistance(node));
+            System.out.println(node + " " + getDistance(node, target));
+            */
+            if (getShortestDistance(target) > getShortestDistance(node) + getDistance(node, target)) {
+
+                distance.put(target, getShortestDistance(node) + getDistance(node, target));
+                predecessors.put(target, node);
+                toVisitNodes.add(target);
+            }
+        }
+
+    }
+
+    private int getDistance(Node node, Node target) {
+        for (Edge edge : edges) {
+            if (edge.source.equals(node)
+                    && edge.dest.equals(target)) {
+                return edge.dist;
+            }
+        }
+        throw new RuntimeException("Should not happen");
+    }
+
+    private List<Node> getNeighbors(Node node) {
+        List<Node> neighbors = new ArrayList<Node>();
+        for (Edge edge : edges) {
+            if (edge.source.equals(node) && !isSettled(edge.dest)) {
+                neighbors.add(edge.dest);
+            }
+        }
+        return neighbors;
+    }
+
+    private Node getMinimum(Set<Node> Nodes) {
+        Node minimum = null;
+        for (Node Node : Nodes) {
+            if (minimum == null) {
+                minimum = Node;
+            } else {
+                if (getShortestDistance(Node) < getShortestDistance(minimum)) {
+                    minimum = Node;
+                }
+            }
+        }
+        return minimum;
+    }
+
+    private boolean isSettled(Node Node) {
+        return visitedNodes.contains(Node);
+    }
+
+    public int getShortestDistance(Node destination) {
+        Integer d = distance.get(destination);
+        if (d == null) {
+            return Integer.MAX_VALUE;
+        } else {
+            return d;
+        }
+    }
+
+    /*
+     * This method returns the path from the source to the selected target and
+     * NULL if no path exists
+     */
+    public LinkedList<Node> getPath(Node target) {
+        LinkedList<Node> path = new LinkedList<Node>();
+        Node step = target;
+        // check if a path exists
+        if (predecessors.get(step) == null) {
+            return null;
+        }
+        path.add(step);
+        while (predecessors.get(step) != null) {
+            step = predecessors.get(step);
+            path.add(step);
+        }
+        // Put it into the correct order
+        Collections.reverse(path);
+        return path;
+    }
+
+}
+
+/**
+ * Breadth first attempt
+ *
+ * Taken from https://www.careercup.com/question?id=20786668
+ *
+ */
+class BFSTest {
+    public void findShortestPath(Node start, Node stop) {
+        //g.getEdges(start);
+        Queue <Node> toVisit = new LinkedList<>();
+        Set <Node> alreadyVisited = new HashSet<>();
+
+        Map <Node, Node> parent = new HashMap<>();
+        alreadyVisited.add(start);
+        toVisit.add(start);
+
+        parent.put(start, null);
+
+        while(!toVisit.isEmpty()) {
+            Node cur = toVisit.poll();
+            //We win
+            if(cur == stop) {
+                Node at = cur;
+                while(at != null){
+                    System.out.print(at + ", ");
+                    at = parent.get(at);
+                }
+                return;
+            }
+            for (Map.Entry<String, Edge> edgeEntry : cur.neighbors.entrySet()) {
+                Edge e = edgeEntry.getValue();
+
+                if(!alreadyVisited.contains(e.dest)) {
+                    parent.put(e.dest, cur);
+                    alreadyVisited.add(e.dest);
+                    toVisit.offer(e.dest);
+                }
+            }
+        }
+        //We lose
+        System.out.println("Couldn't find");
+    }
+}

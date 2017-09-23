@@ -48,7 +48,7 @@ distance of 4).
     CEBCEBC, CEBCEBCEBC.
 
 ### Example:
-Test Input:
+BFSTest Input:
 
 For the test input, the towns are named using the first few letters of the
 alphabet from A to D. A route between two towns (A to B) with a distance

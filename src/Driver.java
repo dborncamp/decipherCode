@@ -1,9 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.StringTokenizer;
-import java.util.ArrayList;
+import java.util.*;
 
 
 public class Driver {
@@ -90,10 +87,6 @@ public class Driver {
         System.out.println("Output #5: " + graph.specificRoute("AED"));
     }
 
-    public void tripStop(){
-        //System.out.println("Output #6: " + graph.triprecurse("C","C", 3, false));
-        //System.out.println("Output #7: " + graph.triprecurse("A","C", 4, true));
-    }
     public void visitCities(){
         graph.visitCities("A", "C", 4);
     }
@@ -104,5 +97,26 @@ public class Driver {
 
     public void visits(){
         graph.visitPaths("A","C", 4);
+    }
+    public void roundRound(){
+        graph.visitPaths("C", "C", 30);
+    }
+
+    public void testshort(){
+        DijkstraAlgorithm dij = new DijkstraAlgorithm(graph);
+        Node searchNode;
+        searchNode = graph.nodes.get("C");
+        dij.execute(searchNode);
+        int distCC = dij.getShortestDistance(graph.nodes.get("C"));
+        System.out.println("Output #8: " + distCC + "  -- Wrong :(");
+
+        searchNode = graph.nodes.get("A");
+        dij.execute(searchNode);
+        int distAC = dij.getShortestDistance(graph.nodes.get("C"));
+        System.out.println("Output #9: " + distAC);
+
+        BFSTest t = new BFSTest();
+        System.out.println("");
+        t.findShortestPath(graph.nodes.get("C"),graph.nodes.get("C"));
     }
 }

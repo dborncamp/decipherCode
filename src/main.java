@@ -5,8 +5,16 @@ public class main {
         //System.out.println(test);
         driver.getInput("src/input.txt");
         driver.makeGraph();
-        //driver.routes();
+
+        // 1 through 5
+        driver.routes();
         //driver.visitCities();
-        driver.visits();
+        // 6, 7 and 10
+        //driver.visits();
+        // 8 and 9
+        driver.testshort();
+
+        // 10
+        driver.roundRound();
     }
 }
