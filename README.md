@@ -43,12 +43,12 @@ distance of 4).
     to C.
     The length of the shortest route (in terms of distance to travel) from B
     to B.
-    The number of different routes from C to C with a distance of less than
+    The number of different routes from C to C with a distance of less than 30
     In the sample data, the trips are: CDC, CEBC, CEBCDC, CDCEBC, CDEBC,
     CEBCEBC, CEBCEBCEBC.
 
 ### Example:
-Test Input:
+BFSTest Input:
 
 For the test input, the towns are named using the first few letters of the
 alphabet from A to D. A route between two towns (A to B) with a distance
@@ -68,3 +68,9 @@ Expected Output:
     Output #8: 9
     Output #9: 9
     Output #10: 7
+    
+    
+    
+## Running
+It will ask the user for a text file that must be in the format of NND, NND, ...
+Where N is a node and D is the distance between the 2.

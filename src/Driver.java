@@ -1,9 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.StringTokenizer;
-import java.util.ArrayList;
+import java.util.*;
 
 
 public class Driver {
@@ -13,8 +10,8 @@ public class Driver {
     private ArrayList<char[]> inputs;
 
     public Driver(){
-         graph = new Graph();
-         inputs = new ArrayList<char[]>();
+        graph = new Graph();
+        inputs = new ArrayList<char[]>();
     }
 
     /**
@@ -37,25 +34,15 @@ public class Driver {
 
             String tok = tempToken.nextToken();
 
-            //System.out.println(tok.toCharArray()[2]);
-            //System.out.println(temp.toCharArray());
-
             inputs.add(tok.toCharArray());
         }
     }
 
     public void makeGraph(){
         for(char[] in: inputs){
-            //System.out.println(String.valueOf(in[0]));
             graph.addEdge(String.valueOf(in[0]), String.valueOf(in[1]),
-                          Character.getNumericValue(in[2]));
+                    Character.getNumericValue(in[2]));
         }
-        //System.out.println(graph.getNode("A"));
-        //System.out.println(graph.nodeMap);
-        //System.out.println(graph.getNodes());
-        //System.out.println(graph.nodes.contains(new Node("A")));
-        //System.out.println(graph.nodes.indexOf(new Node("z")));
-        //graph.printConnections();
     }
 
 
@@ -79,12 +66,56 @@ public class Driver {
         }
     }
 
-    public void routes(){
-        System.out.println("Output #1: " + graph.specificRoute("ABC"));
-        System.out.println("Output #2: " + graph.specificRoute("AD"));
-        System.out.println("Output #2: " + graph.specificRoute("ADE"));
-        System.out.println("Output #4: " + graph.specificRoute("AEBCD"));
-        System.out.println("Output #4: " + graph.specificRoute("AED"));
+    /**
+     * Print the OneToFive for outputs 1 to 5
+     */
+    public void OneToFive(){
+        try {
+            System.out.println("Output #1: " + graph.specificRoute("ABC"));
+            System.out.println("Output #2: " + graph.specificRoute("AD"));
+            System.out.println("Output #3: " + graph.specificRoute("ADC"));
+            System.out.println("Output #4: " + graph.specificRoute("AEBCD"));
+            System.out.println("Output #5: " + graph.specificRoute("AED"));
+        } catch(Exception e) {
+            System.out.println("Nodes are wrong. Something is weird... Stopping these.");
+        }
     }
 
+    public void visitCities(){
+        graph.visitCities("A", "C", 4);
+    }
+
+    public void routeToC(){
+        graph.roundTrip("C", 3);
+    }
+
+    public void SixSeven(){
+
+        int six = graph.visitPaths("C","C", 4);
+        int seven = graph.visitPaths("A","C", 7);
+        System.out.println("Output #6: "+six);
+        System.out.println("Output #7: "+seven);
+
+    }
+
+    public void testshort(){
+        DijkstraAlgorithm dij = new DijkstraAlgorithm(graph);
+        Node searchNode;
+        searchNode = graph.nodes.get("C");
+        dij.execute(searchNode);
+        int distCC = dij.getShortestDistance(graph.nodes.get("C"));
+        System.out.println("Output #8: " + distCC + "  -- Wrong :(");
+
+        searchNode = graph.nodes.get("A");
+        dij.execute(searchNode);
+        int distAC = dij.getShortestDistance(graph.nodes.get("C"));
+        System.out.println("Output #9: " + distAC);
+
+    }
+
+    public void ten(){
+        BFSTest t = new BFSTest();
+        t.findShortestPath(graph.nodes.get("C"),graph.nodes.get("C"));
+        System.out.println("Output #10: A mix of 6,7 and 9. Which I didn't figure out :(");
+    }
 }
