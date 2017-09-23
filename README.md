@@ -68,3 +68,9 @@ Expected Output:
     Output #8: 9
     Output #9: 9
     Output #10: 7
+    
+    
+    
+## Running
+It will ask the user for a text file that must be in the format of NND, NND, ...
+Where N is a node and D is the distance between the 2.

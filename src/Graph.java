@@ -1,5 +1,3 @@
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
-
 import java.util.*;
 
 public class Graph {
@@ -95,7 +93,7 @@ public class Graph {
      * @param route String that contains the cities to visit i.e. ABC for A-B-C
      * @return Total length of route
      */
-    public String specificRoute(String route){
+    public String specificRoute(String route) throws Exception {
         String[] stops = route.split("");
         Edge tempEdge;
         Node startNode;
@@ -130,7 +128,7 @@ public class Graph {
             }
             return Integer.toString(tempEdge.dist);
         } else{
-            throw new ValueException("Need at least 2 stops.");
+            throw new Exception("Need at least 2 stops.");
         }
 
         return Integer.toString(total);
@@ -196,6 +194,12 @@ public class Graph {
     private boolean equal;
     private int numTrips;
     private int visitLimit;
+
+    /**
+     * Recursively try to work 6 and 7. but did not work :(
+     * @param startNode
+     * @param target
+     */
     private void visitQueue(Node startNode, Node target){
         if (startNode.isVisited()){
             Node removeNode = nList.removeLast();
@@ -243,53 +247,63 @@ public class Graph {
     }
 
 
-    public ArrayList<Trip> getPaths(Node startNode, Node target, int visLimit){
+    /**
+     * VERY Wrong way to do the problem I don't understand it.
+     *
+     * @param startNode
+     * @param target
+     * @param type
+     * @return
+     */
+    public ArrayList<Trip> getPaths(Node startNode, Node target, int type){
         Stack<Node> nextNodes = new Stack<Node>();
         ArrayList<Trip> trips = new ArrayList<Trip>();
+        Stack<Node> visited = new Stack<Node>();
 
         int count = 0;
 
         // first push the start node to the next stack.
         nextNodes.push(startNode);
-        System.out.println(startNode.neighbors);
+        //System.out.println(startNode.neighbors);
         Trip trip = new Trip(startNode.neighbors, target, startNode, new Stack<Node>());
-        System.out.println(trip);
+        //System.out.println(trip);
 
         // 1 enter a loop until the next stack is empty.
         while(!nextNodes.isEmpty()){
             // 2 pop the next stack (giving me my start node).
-            System.out.println("Next Nodes: "+nextNodes);
+            //System.out.println("Next Nodes: "+nextNodes);
             Node current = nextNodes.pop();
-            System.out.println("Current: "+ current);
+            //System.out.println("Current: "+ current);
 
             // 3 push it to the visited stack.
             trip.visited.push(current);
+            //System.out.println("Visited Nodes: "+trip.visited);
             // 4 update my current trip.
             trip.currentCity = current;
             //trip.updateCity(current);
-            System.out.println(" Trip: "+trip);
+            //System.out.println(" Trip: "+trip);
 
             // 5 check if the popped value is my goal
-            if ((trip.currentCity == trip.dest) & (trip.visited.size() > 1) & (trip.visited.size()==4)){// & (trip.visited.size() == 4)){
+            if ((trip.currentCity == trip.dest) & (trip.visited.size() > 1) & (trip.visited.size()==4)){
                 //5a - if it meets my goal, I update the trip collection with the current trip
                 trips.add(trip);
-                System.out.println(" ** Found: "+trip);
+                //System.out.println(" ** Found: "+trip);
                 //5b - create a new trip matching the existing.
                 trip = new Trip(trip);
 
             } else {
-                System.out.println(" --- not goal");
+                //System.out.println(" --- not goal");
                 //6 - If it does not meet the goal, then get the destinations I can reach from the node
                 // (I defined a routemap object to give me this).
                 trip.map = current.neighbors;
-                System.out.println(trip.map);
+                //System.out.println(trip.map);
                 // 7- I loop over all the destinations.
                 for (Map.Entry<String, Edge> edgeEntry : trip.map.entrySet()) {
                     Edge edge = edgeEntry.getValue();
 
                     //7a - I check my delimiter condition, if true proceed
                     if (trip.visited.size() != 4) {
-                        System.out.println("Pushing: " + edge.dest);
+                        //System.out.println("Pushing: " + edge.dest);
                         nextNodes.push(edge.dest);
                         //8- if the delimiter condition is false this means the traversal cannot continue.
                     } else {
@@ -305,15 +319,24 @@ public class Graph {
                 }
 
             }
-            trip.visited.pop();
+
+
             // stop possible infinite loop
             count ++;
             if (count > 100) {
-                System.out.println("Limit Reached");
+                //System.out.println("Limit Reached");
                 break;
             }
         }
         return trips;
+    }
+
+    public static boolean delim6(Trip trip){
+        System.out.println("Hi!");
+        if(trip.visited.size() < 4) {
+            return true;
+        }
+        return false;
     }
 
     class Trip{
@@ -349,12 +372,18 @@ public class Graph {
         }
     }
 
-    public void visitPaths(String start, String target, int visLimit){
-        numTrips = 0;
+
+    public int visitPaths(String start, String target, int visLimit){
+        // try using lambda functions but no time...
+        //func.run();
+        // Make sure the input is good
+        start.toUpperCase();
+        target.toUpperCase();
         Node startNode = nodes.get(start);
         Node targNode = nodes.get(target);
         ArrayList<Trip>trips = getPaths(startNode, targNode, visLimit);
-        System.out.println(trips.size());
+        //System.out.println(trips.size());
+        return trips.size();
     }
 
     private void resetDist(){
@@ -526,7 +555,7 @@ class DijkstraAlgorithm {
 }
 
 /**
- * Breadth first attempt
+ * Breadth first search
  *
  * Taken from https://www.careercup.com/question?id=20786668
  *
@@ -549,7 +578,7 @@ class BFSTest {
             if(cur == stop) {
                 Node at = cur;
                 while(at != null){
-                    System.out.print(at + ", ");
+                    //System.out.print(at + ", ");
                     at = parent.get(at);
                 }
                 return;
